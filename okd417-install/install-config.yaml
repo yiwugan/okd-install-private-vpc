@@ -1,0 +1,64 @@
+apiVersion: v1
+baseDomain: example.com 
+credentialsMode: Mint 
+controlPlane:   
+  architecture: amd64
+  hyperthreading: Enabled 
+  name: master
+  platform:
+    aws:
+      additionalSecurityGroupIDs:
+      - <security group id from terraform output>   
+      zones:
+      - ca-central-1a
+      - ca-central-1b
+      - ca-central-1d
+      rootVolume:
+        iops: 4000
+        size: 500
+        type: io1
+      metadataService:
+        authentication: Optional 
+      type: m5.2xlarge
+  replicas: 3
+compute:
+- hyperthreading: Enabled 
+  architecture: amd64
+  name: worker
+  platform:
+    aws:
+      additionalSecurityGroupIDs:
+      - <security group id from terraform output>   
+      rootVolume:
+        iops: 2000
+        size: 500
+        type: io1
+      metadataService:
+        authentication: Optional 
+      type: m5.2xlarge
+      zones:
+      - ca-central-1a
+  replicas: 3
+metadata:
+  name: okd-lab 
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineNetwork:
+  - cidr: 10.0.0.0/16
+  networkType: OVNKubernetes 
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  aws:
+    region: ca-central-1
+    propagateUserTags: true 
+    userTags:
+      adminContact: <your name>
+    subnets: 
+    - <private subnet id 1 from terraform output>   
+    - <private subnet id 2 from terraform output>   
+    - <private subnet id 3 from terraform output>   
+publish: Internal
+pullSecret: 'Quay.io pull secret from https://console.redhat.com/openshift/install/pull-secret'
